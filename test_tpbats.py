@@ -73,4 +73,4 @@ def prime_to_file(num1, num2, prime):
     
 
 generate_prime(1000)
-start_search_prime(14)
+start_search_prime(15)
