@@ -69,8 +69,8 @@ def prime_to_file(num1, num2, prime):
     puth = f'D:\Desktop\Теории\Тест простоты\prime_{num1}_{num2}.txt'
     
     with open(puth, '+w') as file:
-        file.write(translate(prime, True))
-    
+        file.write(translate(prime, True)) 
 
-generate_prime(1000)
+generate_prime(100000)
+print("prime is ready")
 start_search_prime(15)
