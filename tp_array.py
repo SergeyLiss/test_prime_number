@@ -1,8 +1,5 @@
 # Формирование списка простых
 
-from typing import Any
-
-
 class LPN: # List Prime Number
     list_prime = [2]
 

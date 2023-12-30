@@ -73,4 +73,4 @@ def prime_to_file(num1, num2, prime):
 
 generate_prime(100000)
 print("prime is ready")
-start_search_prime(15)
+start_search_prime(13)
