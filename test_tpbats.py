@@ -1,5 +1,6 @@
 import datetime
 import random
+import os.path
 from tpbats import *
 from tp_array import *
 from numeral_system_2_10 import *
@@ -7,6 +8,8 @@ from numeral_system_2_10 import *
 prime_list = [3]
 test = PT()
 translate = NumSys()
+
+
 
 def generate_prime(prime_limit):
     size_pl = 1
@@ -22,16 +25,16 @@ def generate_prime(prime_limit):
                 prime_list.append(i)
                 temp = False
 
-
 def start_search_prime(start_exp):
     b = (1 << (1 << start_exp))
     start_exp += 1
     c = (1 << (1 << start_exp))
     start_exp -= 1
 
+    position = 0x0
     datetime_now = datetime.datetime.now()
-    
-    for i in range(1, 100):
+    limit = True
+    while limit:
         z = False
         x = random.randint(b,c)
         
@@ -46,7 +49,10 @@ def start_search_prime(start_exp):
             print('time= ', (fin - datetime_now))
             datetime_now = fin
             
-        prime_to_file(start_exp, i, x)
+        position = prime_to_file(start_exp, position, x)
+        if position > 0x1ff:
+            limit = False
+        
 
         fin = datetime.datetime.now()
         print('time= ', (fin - datetime_now))
@@ -65,12 +71,23 @@ def poisk_prime(y):
     return z
 
 
-def prime_to_file(num1, num2, prime):
-    puth = f'D:\Desktop\Теории\Тест простоты\prime_{num1}_{num2}.txt'
+def prime_to_file(num1, hex1, prime):
+    puth = f'D:\Desktop\Теории\Тест простоты\prime_{num1}\prime_{num1}_'
+
+    p = True
+    while p:
+        file_puth = puth + str(hex(hex1))[2:] + '.txt'
+        if not os.path.isfile(file_puth):
+            p = False
+            puth = file_puth
+        hex1 += 1
     
     with open(puth, '+w') as file:
-        file.write(translate(prime, True)) 
+        file.write(translate(prime, True))
+    
+    return hex1
 
-generate_prime(100000)
+generate_prime(200000)
 print("prime is ready")
-start_search_prime(13)
+start_search_prime(11)
+print('FINISH')
