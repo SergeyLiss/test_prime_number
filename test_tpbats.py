@@ -9,8 +9,6 @@ prime_list = [3]
 test = PT()
 translate = NumSys()
 
-
-
 def generate_prime(prime_limit):
     size_pl = 1
     for i in range(5, prime_limit, 2):
@@ -45,31 +43,27 @@ def start_search_prime(start_exp):
             x += 2
 
             z = poisk_prime(x)
-            fin = datetime.datetime.now()
-            print('time= ', (fin - datetime_now))
-            datetime_now = fin
             
         position = prime_to_file(start_exp, position, x)
         if position > 0x1ff:
             limit = False
         
-
-        fin = datetime.datetime.now()
-        print('time= ', (fin - datetime_now))
-        datetime_now = fin
-
 def poisk_prime(y):
     z = True
 
     for j in prime_list:
         if y % j == 0:
             z = False
+            break
 
     if z:
+        datetime_now = datetime.datetime.now()
         z = test(y)
+        print('\ntime= ', (datetime.datetime.now() - datetime_now))
+    else:
+        print("#", end="")
     
     return z
-
 
 def prime_to_file(num1, hex1, prime):
     puth = f'D:\Desktop\Теории\Тест простоты\prime_{num1}\prime_{num1}_'
@@ -87,7 +81,7 @@ def prime_to_file(num1, hex1, prime):
     
     return hex1
 
-generate_prime(200000)
-print("prime is ready")
-start_search_prime(11)
+generate_prime(1_111_111)
+print("prime is ready", len(prime_list))
+start_search_prime(12)
 print('FINISH')
