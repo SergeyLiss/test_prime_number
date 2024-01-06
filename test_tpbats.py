@@ -81,7 +81,7 @@ def prime_to_file(num1, hex1, prime):
     
     return hex1
 
-generate_prime(1_111_111)
+generate_prime(2_000_000)
 print("prime is ready", len(prime_list))
-start_search_prime(12)
+start_search_prime(13)
 print('FINISH')
