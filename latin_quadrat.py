@@ -1,22 +1,30 @@
-a = 10000
+a = 10
 
-def p_to_n(n):
-    f = 1
+def p_to_n_m(n, m):
+    fact = 1
     for i in range(1, (n+1)):
-        f *= i
-    x = f
-    for j in range(1, (n+1)):
+        fact *= i
+    
+    x = fact
+    temp = fact
+
+    for j in range(1, (m+1)):
+        temp //= (n+1-j)
+        temp *= (m+1-j)
+        temp //= j
+
         if j & 1:
-            m = -1
+            x -= temp
         else:
-            m = 1
-        for k in range(1, (j+1)):
-            m *= k
-        x += (f // m)
+            x += temp
+
     return x
 
-b = p_to_n(a)
-print(f"{a} ---> {b}")
+for p in range(2, a):
+    print()
+    for k in range((p+1)):
+        c = p_to_n_m(p, k)
+        print(f"{p}.{k}\t--->\t{c}")
 
 
 

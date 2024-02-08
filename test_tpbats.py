@@ -1,6 +1,7 @@
 import datetime
 import random
 import os.path
+import multiprocessing
 from tpbats import *
 from tp_array import *
 from numeral_system_2_10 import *
@@ -81,7 +82,9 @@ def prime_to_file(num1, hex1, prime):
     
     return hex1
 
+start = datetime.datetime.now()
 generate_prime(2_000_000)
+print('time gen prime = ', (datetime.datetime.now() - start))
 print("prime is ready", len(prime_list))
 start_search_prime(13)
 print('FINISH')
