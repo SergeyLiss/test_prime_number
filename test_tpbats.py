@@ -1,90 +1,107 @@
-import datetime
-import random
-import os.path
+from datetime import datetime as dt
+from random import randint
+from os.path import isfile
 import multiprocessing
+from typing import Any
 from tpbats import *
-from tp_array import *
 from numeral_system_2_10 import *
 
-prime_list = [3]
-test = PT()
-translate = NumSys()
+class Primer():
 
-def generate_prime(prime_limit):
-    size_pl = 1
-    for i in range(5, prime_limit, 2):
-        temp = True
-        j = 0
-        while temp:
-            if i % prime_list[j] == 0:
-                temp = False
-            j += 1
-            if j == size_pl:
-                size_pl += 1
-                prime_list.append(i)
-                temp = False
+    def __init__(self, start_exp, prime_limit):
+        self.exp = start_exp                                # Степень
+        self.number_start = (1 << (1 << self.exp))          # Минимальное число
+        self.number_finish = (1 << (1 << (self.exp + 1)))   # Максимальное число
+        self.prime = 0                                      # Простое число
+        self.prime_limit = prime_limit                      # Лимит простых чисел
+        self.file_limit = 0x401                             # Лимит файлов = 1000
+        self.file_position = 0x0                            # Текущий файл
+        self.prime_list = [3]                               # Список простых чисел
+        self.test_prime = PT()                              # Класс на проверку простоты
+        self.translate = NumSys()                           # Класс для перевода в десятеричную систему счисления
+        self.logs = ''                                      # Строка для вывода на экран
+        self.time_now = dt.now()                            #
+        pass
 
-def start_search_prime(start_exp):
-    b = (1 << (1 << start_exp))
-    start_exp += 1
-    c = (1 << (1 << start_exp))
-    start_exp -= 1
-
-    position = 0x0
-    datetime_now = datetime.datetime.now()
-    limit = True
-    while limit:
-        z = False
-        x = random.randint(b,c)
+    def __call__(self):
+        self.generate_prime()
+        self.start_search_prime()
+        pass
+    
+    def generate_prime(self):
+        size_pl = 1
+        for i in range(5, self.prime_limit, 2):
+            temp = True
+            j = 0
+            while temp:
+                if i % self.prime_list[j] == 0:
+                    temp = False
+                j += 1
+                if j == size_pl:
+                    size_pl += 1
+                    self.prime_list.append(i)
+                    temp = False
+        pass
+    
+    def prime_to_file(self):
+        puth = f'D:\Desktop\Теории\Тест простоты\prime_{self.exp}\prime_{self.exp}_'
         
-        if not (x & 1):
-            x += 1
+        flag = True
+        while flag:
+            file_puth = puth + str(hex(self.file_position))[2:] + '.txt'
+            if not isfile(file_puth):
+                flag = False
+                puth = file_puth
+            self.file_position += 1
         
-        while not z:
-            x += 2
+        with open(puth, '+w') as file:
+            file.write(self.translate(self.prime, True))
+        pass
 
-            z = poisk_prime(x)
+    def poisk_prime(self):
+        flag = True
+        
+        for j in self.prime_list:
+            if self.prime % j == 0:
+                flag = False
+                break
+        if flag:
+            self.time_now = dt.now()
+            flag = self.test_prime(self.prime)
+            self.logs += f'\ntime= {(dt.now() - self.time_now)}'
+            self.print_console()
+        else:
+            self.logs += '#'
+        
+        return flag
+    
+    def start_search_prime(self):
+        self.time_now = dt.now()
+        while self.file_position < self.file_limit:
+            flag = False
+            self.prime = randint(self.number_start, self.number_finish)
             
-        position = prime_to_file(start_exp, position, x)
-        if position > 0x1ff:
-            limit = False
+            if not (self.prime & 1):
+                self.prime += 1
+            
+            while not flag:
+                self.prime += 2
+                
+                flag = self.poisk_prime()
+                
+                if flag:
+                    self.prime_to_file()
+        pass
+
+    def print_console(self):
+        print(self.logs)
+        self.logs = ''
+        pass
         
-def poisk_prime(y):
-    z = True
-
-    for j in prime_list:
-        if y % j == 0:
-            z = False
-            break
-
-    if z:
-        datetime_now = datetime.datetime.now()
-        z = test(y)
-        print('\ntime= ', (datetime.datetime.now() - datetime_now))
-    else:
-        print("#", end="")
-    
-    return z
-
-def prime_to_file(num1, hex1, prime):
-    puth = f'D:\Desktop\Теории\Тест простоты\prime_{num1}\prime_{num1}_'
-
-    p = True
-    while p:
-        file_puth = puth + str(hex(hex1))[2:] + '.txt'
-        if not os.path.isfile(file_puth):
-            p = False
-            puth = file_puth
-        hex1 += 1
-    
-    with open(puth, '+w') as file:
-        file.write(translate(prime, True))
-    
-    return hex1
-
-start = datetime.datetime.now()
-generate_prime(2_000_000)
-print('time gen prime = ', (datetime.datetime.now() - start))
-print("prime is ready", len(prime_list))
-start_search_prime(13)
-print('FINISH')
+if __name__ == '__main__':
+    runner = Primer(9, 10000)
+    runner.generate_prime()
+    print('time gen prime = ', (dt.now() - runner.time_now))
+    print("prime is ready", len(runner.prime_list))
+    runner.start_search_prime()
+    print('FINISH')
