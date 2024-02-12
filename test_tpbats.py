@@ -1,7 +1,7 @@
 from datetime import datetime as dt
 from random import randint
 from os.path import isfile
-import multiprocessing
+import multiprocessing as mps
 from typing import Any
 from tpbats import *
 from numeral_system_2_10 import *
@@ -21,6 +21,8 @@ class Primer():
         self.translate = NumSys()                           # Класс для перевода в десятеричную систему счисления
         self.logs = ''                                      # Строка для вывода на экран
         self.time_now = dt.now()                            #
+
+        self.lock: object
         pass
 
     def __call__(self):
@@ -69,7 +71,8 @@ class Primer():
             self.time_now = dt.now()
             flag = self.test_prime(self.prime)
             self.logs += f'\ntime= {(dt.now() - self.time_now)}'
-            self.print_console()
+            with self.lock:
+                self.print_console()
         else:
             self.logs += '#'
         
@@ -90,7 +93,8 @@ class Primer():
                 flag = self.poisk_prime()
                 
                 if flag:
-                    self.prime_to_file()
+                    with self.lock:
+                        self.prime_to_file()
         pass
 
     def print_console(self):
@@ -99,9 +103,13 @@ class Primer():
         pass
         
 if __name__ == '__main__':
-    runner = Primer(9, 10000)
+    runner = Primer(10, 100000)
     runner.generate_prime()
     print('time gen prime = ', (dt.now() - runner.time_now))
     print("prime is ready", len(runner.prime_list))
-    runner.start_search_prime()
+    with mps.Pool(mps.cpu_count()) as pool:
+        runner.lock = mps.RLock()
+        pool.apply_async(runner.start_search_prime())
+        pool.close()
+        pool.join()
     print('FINISH')
