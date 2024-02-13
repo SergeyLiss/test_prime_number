@@ -22,12 +22,19 @@ class Primer():
         self.logs = ''                                      # Строка для вывода на экран
         self.time_now = dt.now()                            #
 
-        self.lock: object
+        self.lock: object                                   #
         pass
 
     def __call__(self):
         self.generate_prime()
-        self.start_search_prime()
+
+        with mps.Pool(mps.cpu_count()) as pool:
+            self.logs = f'cpu_count= {mps.cpu_count()}'
+            self.print_console()
+            self.lock = mps.RLock()
+            pool.apply_async(self.start_search_prime())
+            pool.close()
+            pool.join()
         pass
     
     def generate_prime(self):
@@ -71,8 +78,8 @@ class Primer():
             self.time_now = dt.now()
             flag = self.test_prime(self.prime)
             self.logs += f'\ntime= {(dt.now() - self.time_now)}'
-            with self.lock:
-                self.print_console()
+            # with self.lock:
+            self.print_console()
         else:
             self.logs += '#'
         
@@ -103,13 +110,10 @@ class Primer():
         pass
         
 if __name__ == '__main__':
-    runner = Primer(10, 100000)
+    runner = Primer(11, 1_000_000)
     runner.generate_prime()
     print('time gen prime = ', (dt.now() - runner.time_now))
     print("prime is ready", len(runner.prime_list))
-    with mps.Pool(mps.cpu_count()) as pool:
-        runner.lock = mps.RLock()
-        pool.apply_async(runner.start_search_prime())
-        pool.close()
-        pool.join()
+    # runner.start_search_prime()
+    runner()
     print('FINISH')
