@@ -29,7 +29,7 @@ class Primer():
         self.generate_prime()
 
         with mps.Pool(mps.cpu_count()) as pool:
-            self.logs = f'cpu_count= {mps.cpu_count()}'
+            self.logs = f'cpu_count= {mps.cpu_count()}\n'
             self.print_console()
             self.lock = mps.RLock()
             pool.apply_async(self.start_search_prime())
@@ -51,9 +51,7 @@ class Primer():
                     self.prime_list.append(i)
                     temp = False
         
-        self.logs = f'prime is ready...\n\
-                        time gen prime = {(dt.now() - self.time_now)}\n\
-                        list size= {len(self.prime_list)}'
+        self.logs = f'prime is ready...\ntime gen prime = {(dt.now() - self.time_now)}\nlist size= {len(self.prime_list)}\n'
         self.print_console()
         pass
     
@@ -115,7 +113,7 @@ class Primer():
         pass
         
 if __name__ == '__main__':
-    runner = Primer(11, 1_000_000)
+    runner = Primer(11, 800_000)
     # runner.generate_prime()
     # runner.start_search_prime()
     runner()
