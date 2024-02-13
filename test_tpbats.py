@@ -50,6 +50,11 @@ class Primer():
                     size_pl += 1
                     self.prime_list.append(i)
                     temp = False
+        
+        self.logs = f'prime is ready...\n\
+                        time gen prime = {(dt.now() - self.time_now)}\n\
+                        list size= {len(self.prime_list)}'
+        self.print_console()
         pass
     
     def prime_to_file(self):
@@ -112,8 +117,6 @@ class Primer():
 if __name__ == '__main__':
     runner = Primer(11, 1_000_000)
     # runner.generate_prime()
-    # print('time gen prime = ', (dt.now() - runner.time_now))
-    # print("prime is ready", len(runner.prime_list))
     # runner.start_search_prime()
     runner()
     print('FINISH')
