@@ -111,9 +111,9 @@ class Primer():
         
 if __name__ == '__main__':
     runner = Primer(11, 1_000_000)
-    runner.generate_prime()
-    print('time gen prime = ', (dt.now() - runner.time_now))
-    print("prime is ready", len(runner.prime_list))
+    # runner.generate_prime()
+    # print('time gen prime = ', (dt.now() - runner.time_now))
+    # print("prime is ready", len(runner.prime_list))
     # runner.start_search_prime()
     runner()
     print('FINISH')
