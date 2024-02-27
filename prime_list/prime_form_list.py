@@ -6,13 +6,17 @@
 # Файлы - number_list_k.prime, где k - итерация
 
 from os.path import isfile
+import json
 
 class PrimeListForm():
-    #
-    bytelist: list
 
-    def __init__(self, iterable_index_file) -> None:
-        #
+    def __init__(self) -> None:
+        # Имя лог-файла, лог-файл
+        self.name_log = 'templates.json'
+        self.log_file = []
+        # Флаг остановки алгоритма
+        self.flag_exit = True
+        # Константы
         self.const_thirty = 30
         self.const_index = 8
         # Список остатков по модулю 30. Представленны числа, которые не делятся на множители числа 30.
@@ -24,40 +28,53 @@ class PrimeListForm():
         # Размер файла 4 Мб = 2^22
         self.file_size = 4_194_304
         # Итерационный индекс файла
-        self.iif = iterable_index_file
-        pass
-
-    # 
-    def file_load(self, attr):
-        # Атрибуты:
-        # 'r' - read
-        # 'w' - write
+        self.iif = 0
         #
-
-        puth_file = f'number_list_{self.iif}.prime'
-        puth_log = 'logs.json'
-
-        if attr == 'r':
-            if isfile(puth_file):
-                with open(puth_file, 'rb') as file:
-                    self.bytelist = file.read()
-            else:
-                self.bytelist = bytearray(self.file_size)
-
-
-        elif attr == 'w':
-            if isfile(puth_file):
-                with open(puth_file, 'wb') as file:
-                    file.write(self.bytelist)
-            else:
-                with open(puth_file, 'xb') as file:
-                    file.write(self.bytelist)
-        
-        else:
-            print("error")
+        self.file_name = ''
+        #
+        self.bytelist = b''
         pass
 
     #
+    def __call__(self):
+        self.open_file(self.name_log, 'r')
+
+        self.file_name = self.log_file['all']['directory'] \
+                        + self.log_file['all']['file_prefix'] \
+                        + str(self.log_file['now']['file_id']) \
+                        + self.log_file['all']['file_suffix']
+        
+        self.open_file(self.file_name, 'br')
+
+        self.algoritm()
+
+
+        pass
+
+    #
+    def algoritm(self):
+        pass
+    #
+    def open_file(self, name, attr):
+        if isfile(name):
+            with open(name, attr) as file:
+                match attr:
+                    case 'r':
+                        self.log_file = file.read()
+                    case 'w':
+                        file.write(json.dumps(self.log_file))
+                    case 'br':
+                        self.bytelist = file.read()
+                    case 'bw':
+                        file.write(self.bytelist)
+        else:
+            with open(name, attr) as file:
+                if name == self.name_log:
+                    self.log_file = self.create_log()
+                    file.write(json.dumps(self.log_file))
+                else:
+                    self.exceptions(0, name)
+                    self.byte_list_null()
         pass
 
     # Формирование списка произведений: [0] - остаток, [1] - целый делитель
@@ -95,4 +112,43 @@ class PrimeListForm():
         index = pow(index, 1/2)
         index = int(index) + 1
         return index
+    
+    #
+    def byte_list_null(self):
+        temp = self.file_size << 3
+        temp = temp + 1
+        temp = 1 << temp
+        temp = temp - 1
+        if self.log_file['now']['file_id'] == 0:
+            temp = temp - 1
+        self.bytelist = temp.to_bytes(self.file_size, 'little')
+
+    #
+    def exceptions(self, cod, name=None):
+        match cod:
+            case 0:
+                print(f"Файл {name} создан...")
+    
+    #
+    def create_log(self):
+        latitude = {
+            'now':                                  # В процессе сортировки
+            {
+                'file_id': 0,                       # Текущий файл в обработке
+                'file_position': 1,                 # Текущая позиция в обработке
+                'sqrt_position': 0,                 # Текущая позиция от корня
+            },
+            
+            'all':                                  # Характеристика по всем файлам
+            {
+                'directory': 'data/',               # Директория хранения файлов
+                'file_prefix': 'number_list_',      # Часть имени файла -> Префикс
+                'file_suffix': '.prime',            # Расширение файла -> Суффикс
+                'prime': 10,                        # Количество простых чисел во всех файлах. Начальное значение - 10, количество простых чисел до 30.
+                'prime_list': [2, 3, 5],            # Начальные простые числа. Не включены в базу файлов. Делители числа 30.
+                'file_id': 0                        # Количество обработаных файлов
+            }
+        }
+        return json.dumps(latitude)
+
     

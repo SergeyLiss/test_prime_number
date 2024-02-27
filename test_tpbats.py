@@ -113,7 +113,7 @@ class Primer():
         pass
         
 if __name__ == '__main__':
-    runner = Primer(11, 800_000)
+    runner = Primer(12, 2_000_000)
     # runner.generate_prime()
     # runner.start_search_prime()
     runner()
