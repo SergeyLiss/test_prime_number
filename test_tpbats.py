@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import json
 from random import randint
 from os.path import isfile
 import multiprocessing as mps
@@ -13,20 +14,22 @@ class Primer():
         self.number_start = (1 << (1 << self.exp))          # Минимальное число
         self.number_finish = (1 << (1 << (self.exp + 1)))   # Максимальное число
         self.prime = 0                                      # Простое число
+        self.prime_start = 0                                #
         self.prime_limit = prime_limit                      # Лимит простых чисел
         self.file_limit = 0x401                             # Лимит файлов = 1000
         self.file_position = 0x0                            # Текущий файл
-        self.prime_list = [3]                               # Список простых чисел
+        self.prime_list = []                               # Список простых чисел
         self.test_prime = PT()                              # Класс на проверку простоты
         self.translate = NumSys()                           # Класс для перевода в десятеричную систему счисления
         self.logs = ''                                      # Строка для вывода на экран
         self.time_now = dt.now()                            #
-
         self.lock: object                                   #
         pass
 
     def __call__(self):
+        self.json_load(True)
         self.generate_prime()
+        self.json_load(False)
 
         with mps.Pool(mps.cpu_count()) as pool:
             self.logs = f'cpu_count= {mps.cpu_count()}\n'
@@ -36,10 +39,21 @@ class Primer():
             pool.close()
             pool.join()
         pass
+
+    def json_load(self, flag):
+        if flag:
+            with open('prime_list.json', 'r') as fj:
+                self.prime_list = json.loads(fj.read())
+                self.prime = len(self.prime_list)
+                self.prime_start = self.prime_list[-1] + 2
+        else:
+            with open('prime_list.json', 'w') as fj:
+                fj.write(json.dumps(self.prime_list))
+        pass
     
     def generate_prime(self):
         size_pl = 1
-        for i in range(5, self.prime_limit, 2):
+        for i in range(self.prime_start, self.prime_limit, 2):
             temp = True
             j = 0
             while temp:
@@ -113,8 +127,6 @@ class Primer():
         pass
         
 if __name__ == '__main__':
-    runner = Primer(13, 3_000_000)
-    # runner.generate_prime()
-    # runner.start_search_prime()
+    runner = Primer(13, 10_000_000)
     runner()
     print('FINISH')
